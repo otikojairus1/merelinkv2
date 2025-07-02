@@ -215,6 +215,7 @@ export default function SignupScreen() {
             width={799.258}
             height={645.667}
             viewBox="0 0 799.258 645.667"
+        
           >
             <Defs>
               <LinearGradient

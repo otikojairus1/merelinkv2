@@ -1,16 +1,17 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useColorScheme } from "nativewind";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
   FlatList,
   ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useColorScheme } from "nativewind";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
 
 export default function HomeScreen() {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const [currentOrg, setCurrentOrg] = useState("Acme Corp");
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
 
@@ -90,9 +91,9 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity onPress={toggleColorScheme}>
-            <MaterialCommunityIcons
-              name={colorScheme === "dark" ? "weather-sunny" : "weather-night"}
+          <TouchableOpacity onPress={() => {}}>
+            <AntDesign
+              name="user"
               size={24}
               color={colorScheme === "dark" ? "#FBBF24" : "#6B7280"}
             />
