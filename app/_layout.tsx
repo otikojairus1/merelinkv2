@@ -35,7 +35,7 @@ export default function RootLayout() {
     <Stack>
       {showOnboarding ? (
         <Stack.Screen
-          name="index" // Renders the onboarding screen first
+          name="index" // Renders the onboardgit branch -M maining screen first
           options={{ headerShown: false }}
         />
       ) : (

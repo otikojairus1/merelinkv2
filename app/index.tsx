@@ -1,6 +1,6 @@
 import "../global.css";
-import { OnboardingScreen } from "./features/onboarding";
+import SignupScreen from "./features/onboarding/Signup";
 
 export default function Index() {
-  return <OnboardingScreen />;
+  return <SignupScreen />;
 }
