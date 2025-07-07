@@ -10,5 +10,5 @@ import SignupScreen from "./features/onboarding/Signup";
 import VerifyEmailScreen from "./features/onboarding/VerifyScreen";
 
 export default function Index() {
-  return <OrganizationInviteScreen/>;
+  return <HomeScreen/>;
 }
