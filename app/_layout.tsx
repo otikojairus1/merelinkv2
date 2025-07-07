@@ -1,27 +1,20 @@
-// app/_layout.tsx
-import { Stack } from "expo-router";
-// import { OnboardingScreen } from "../features/onboarding";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { useEffect, useState } from "react";
+import { Stack } from "expo-router";
+import { useState } from "react";
 import { Text, View } from "react-native";
 
 export default function RootLayout() {
-  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
-
-  // Load fonts (optional)
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(true);
   const [fontsLoaded] = useFonts({
     // "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
   });
-
-  // Check if onboarding is completed
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      const completed = await AsyncStorage.getItem("@onboarding_completed");
-      setShowOnboarding(completed === "true");
-    };
-    checkOnboardingStatus();
-  }, []);
+  // useEffect(() => {
+  //   const checkOnboardingStatus = async () => {
+  //     const completed = await AsyncStorage.getItem("@onboarding_completed");
+  //     setShowOnboarding(completed === "true");
+  //   };
+  //   checkOnboardingStatus();
+  // }, []);
 
   if (!fontsLoaded || showOnboarding === null) {
     return (
@@ -33,17 +26,35 @@ export default function RootLayout() {
 
   return (
     <Stack>
-      {showOnboarding ? (
-        <Stack.Screen
-          name="index" // Renders the onboardgit branch -M maining screen first
-          options={{ headerShown: false }}
-        />
-      ) : (
-        <Stack.Screen
-          name="(tabs)" // Your main app tabs/screens
-          options={{ headerShown: false }}
-        />
-      )}
+      <Stack.Screen
+        name="features/onboarding/Signup"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="features/onboarding/VerifyScreen"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="features/onboarding/Login"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="features/onboarding/ResetPassword"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="features/onboarding/OrganizationInvite"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="features/Home/Analytics"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="features/Home/ProjectList"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { Link, router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import {
@@ -139,7 +140,10 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center mt-2">
+            <Link
+              href="/features/onboarding/OrganizationInvite"
+              className="flex-row items-center mt-2"
+            >
               <MaterialCommunityIcons
                 name="email-outline"
                 size={20}
@@ -148,7 +152,7 @@ export default function HomeScreen() {
               <Text className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
                 Invite Team Members
               </Text>
-            </TouchableOpacity>
+            </Link>
           </View>
         )}
       </View>
@@ -170,7 +174,12 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center">
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/features/Home/Analytics");
+            }}
+            className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center"
+          >
             <View className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full mb-2">
               <MaterialCommunityIcons
                 name="chart-bar"
@@ -190,7 +199,11 @@ export default function HomeScreen() {
             <Text className="text-xl font-bold text-gray-900 dark:text-white">
               Recent Projects
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/features/Home/ProjectList");
+              }}
+            >
               <Text className="text-blue-600 dark:text-blue-400">View All</Text>
             </TouchableOpacity>
           </View>
@@ -198,6 +211,10 @@ export default function HomeScreen() {
           <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
             {recentProjects.map((project) => (
               <TouchableOpacity
+                onPress={() => {
+                  // Navigate to project details
+                  router.push(`/features/Home/Analytics`);
+                }}
                 key={project.id}
                 className="py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
               >

@@ -118,7 +118,7 @@ export default function LoginScreen() {
         {/* Forgot Password Link */}
         <TouchableOpacity className="self-end mb-6">
           <Link
-            href="/reset-password"
+            href="/features/onboarding/ResetPassword"
             className="text-blue-600 dark:text-blue-400 text-sm font-medium"
           >
             Forgot Password?
@@ -127,7 +127,7 @@ export default function LoginScreen() {
 
         {/* Login Button */}
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)")}
+          onPress={() => router.push("/")}
           className="bg-blue-600 dark:bg-blue-500 py-4 rounded-xl shadow-md shadow-blue-500/20 dark:shadow-blue-900/30"
         >
           <Text className="text-white text-center font-bold text-lg">
@@ -141,7 +141,7 @@ export default function LoginScreen() {
             Don't have an account?{" "}
           </Text>
           <Link
-            href="/signup"
+            href="/features/onboarding/Signup"
             className="text-blue-600 dark:text-blue-400 font-medium"
           >
             Sign Up
@@ -149,9 +149,8 @@ export default function LoginScreen() {
         </View>
       </View>
       {/* Decorative Bottom Element */}
-      <View className="absolute bottom-[-21%] left-0  items-center opacity-20 dark:opacity-30">
+      <View className="absolute pointer-events-none bottom-[-21%] left-0  items-center opacity-20 dark:opacity-30">
         <Svg
-          xmlns="http://www.w3.org/2000/svg"
           width={504.87298}
           height={452.10516}
           viewBox="0 0 504.87298 452.10516"

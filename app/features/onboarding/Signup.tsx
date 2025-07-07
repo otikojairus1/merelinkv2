@@ -30,7 +30,8 @@ export default function SignupScreen() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = () => router.push("/verify-email");
+  const handleSignup = () =>
+    router.replace("/features/onboarding/VerifyScreen");
 
   // Custom outlined icons as components
   const OutlinedUser = () => (
@@ -201,7 +202,7 @@ export default function SignupScreen() {
             Already registered?{" "}
           </Text>
           <Link
-            href="/login"
+            href="/features/onboarding/Login"
             className="text-blue-600 dark:text-blue-400 font-medium"
           >
             Sign In
@@ -209,13 +210,12 @@ export default function SignupScreen() {
         </View>
 
         {/* Decorative Bottom Element */}
-        <View className="absolute bottom-0 left-0 right-0 items-center opacity-20 dark:opacity-30">
+        <View className="absolute pointer-events-none bottom-0 left-0 right-0 items-center opacity-20 dark:opacity-30">
           <Svg
-            xmlns="http://www.w3.org/2000/svg"
+            // xmlns="http://www.w3.org/2000/svg"
             width={799.258}
             height={645.667}
             viewBox="0 0 799.258 645.667"
-        
           >
             <Defs>
               <LinearGradient

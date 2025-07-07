@@ -4,16 +4,6 @@ import { MotiText, MotiView } from "moti";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 
-import Svg, {
-  Circle,
-  Defs,
-  Ellipse,
-  G,
-  LinearGradient,
-  Path,
-  Stop,
-} from "react-native-svg";
-
 import {
   KeyboardAvoidingView,
   Platform,
@@ -28,8 +18,16 @@ const OrganizationInviteScreen = () => {
   const { colorScheme } = useColorScheme();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
-  const [status, setStatus] = useState("idle"); // 'idle' | 'searching' | 'found' | 'inviting' | 'success'
-  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState<
+    "idle" | "searching" | "found" | "inviting" | "success"
+  >("idle"); // 'idle' | 'searching' | 'found' | 'inviting' | 'success'
+  type User = {
+    id: string;
+    name: string;
+    avatar: string;
+    currentOrgs: string[];
+  };
+  const [user, setUser] = useState<User | null>(null);
 
   const textColor = colorScheme === "dark" ? "text-white" : "text-black";
   const cardBg = colorScheme === "dark" ? "bg-gray-800" : "bg-white";
@@ -124,7 +122,7 @@ const OrganizationInviteScreen = () => {
             transition={{ delay: 300 }}
             className="text-gray-500 dark:text-gray-400 mt-2 text-center"
           >
-            {user.name} has been invited to join as{" "}
+            {user ? user.name : "The user"} has been invited to join as{" "}
             {role === "admin" ? "an admin" : "a member"}
           </MotiText>
 
@@ -143,7 +141,7 @@ const OrganizationInviteScreen = () => {
               </Text>
             </TouchableOpacity>
 
-            <Link href="/(tabs)" asChild>
+            <Link href="/" asChild>
               <TouchableOpacity className="py-3 px-6 rounded-lg mt-3 border border-gray-200 dark:border-gray-700 items-center">
                 <Text className={`${textColor} font-medium`}>
                   Back to Dashboard
@@ -317,7 +315,6 @@ const OrganizationInviteScreen = () => {
           )}
         </>
       )}
-
     </KeyboardAvoidingView>
   );
 };

@@ -91,7 +91,9 @@ export default function VerifyEmailScreen() {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)")}
+          onPress={() =>
+            router.push("/features/onboarding/Login")
+          }
           className="bg-blue-600 dark:bg-blue-500 py-4 rounded-xl shadow-md shadow-blue-500/20 dark:shadow-blue-900/30"
         >
           <Text className="text-white text-center font-bold text-lg">
