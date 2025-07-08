@@ -26,6 +26,8 @@ export default function RootLayout() {
 
   return (
     <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+
       <Stack.Screen
         name="features/onboarding/screens/ManageUsers"
         options={{ headerShown: false }}
@@ -50,7 +52,6 @@ export default function RootLayout() {
         name="features/onboarding/VerifyScreen"
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="features/onboarding/Login"
         options={{ headerShown: false }}

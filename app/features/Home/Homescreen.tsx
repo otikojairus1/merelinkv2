@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import {
@@ -92,7 +92,11 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/features/onboarding/screens/Profile");
+            }}
+          >
             <AntDesign
               name="user"
               size={24}
@@ -129,7 +133,12 @@ export default function HomeScreen() {
               </TouchableOpacity>
             ))}
 
-            <TouchableOpacity className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/features/onboarding/createOrganization");
+              }}
+              className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600"
+            >
               <MaterialCommunityIcons
                 name="plus-circle-outline"
                 size={20}
@@ -140,9 +149,11 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
 
-            <Link
-              href="/features/onboarding/OrganizationInvite"
-              className="flex-row items-center mt-2"
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/features/onboarding/OrganizationInvite");
+              }}
+              className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600"
             >
               <MaterialCommunityIcons
                 name="email-outline"
@@ -152,7 +163,7 @@ export default function HomeScreen() {
               <Text className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
                 Invite Team Members
               </Text>
-            </Link>
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -161,7 +172,12 @@ export default function HomeScreen() {
       <ScrollView className="flex-1 px-6 pt-6">
         {/* Quick Actions */}
         <View className="flex-row justify-between mb-8">
-          <TouchableOpacity className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center">
+          <TouchableOpacity
+            className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center"
+            onPress={() => {
+              router.push("/features/onboarding/screens/AddProjects");
+            }}
+          >
             <View className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mb-2">
               <MaterialCommunityIcons
                 name="plus-circle"
