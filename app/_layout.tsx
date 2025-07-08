@@ -27,6 +27,10 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen
+        name="features/onboarding/screens/ManageUsers"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="features/onboarding/screens/Profile"
         options={{ headerShown: false }}
       />

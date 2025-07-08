@@ -1,20 +1,19 @@
-import { useState } from "react";
 import {
-  View,
-  Text,
-  Switch,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from "react-native";
-import {
-  MaterialIcons,
-  MaterialCommunityIcons,
   Feather,
   Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-import { Link } from "expo-router";
+import { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function ProfileScreen() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
