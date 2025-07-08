@@ -26,11 +26,12 @@ export default function RootLayout() {
 
   return (
     <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+
       <Stack.Screen
         name="features/onboarding/screens/AddForm"
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
 
       <Stack.Screen
         name="features/onboarding/screens/ManageUsers"

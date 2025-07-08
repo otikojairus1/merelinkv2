@@ -1,8 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
 const AnalyticsScreen = () => {
@@ -311,9 +311,10 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
   };
 
   const handleCreateForm = () => {
-    Alert.alert("Create Form", `Create new form for ${project.name}`);
+    router.push("/features/onboarding/screens/AddForm");
+    // Alert.alert("Create Form", `Create new form for ${project.name}`);
     // Implement form creation logic
-    setShowActions(false);
+    // setShowActions(false);
   };
 
   const handleAssignLeader = () => {
@@ -409,7 +410,7 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
       {/* Action Buttons - Shown when menu is clicked */}
       {showActions && (
         <View className={`mt-3 p-3 rounded-lg ${buttonBg}`}>
-          <Link href={`/projects/${project.id}/create-form`} asChild>
+          {/* <Link href={`/projects/${project.id}/create-form`} asChild> */}
             <TouchableOpacity
               className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
               onPress={handleCreateForm}
@@ -423,8 +424,8 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
                 Create New Form
               </Text>
             </TouchableOpacity>
-          </Link>
-          <Link href={`/projects/${project.id}/create-form`} asChild>
+          {/* </Link> */}
+          {/* <Link href={`/projects/${project.id}/create-form`} asChild> */}
             <TouchableOpacity
               className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
               onPress={handleCreateForm}
@@ -438,7 +439,7 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
                 Submit Form
               </Text>
             </TouchableOpacity>
-          </Link>
+          {/* </Link> */}
 
           <Link href={`/projects/${project.id}/assign-leader`} asChild>
             <TouchableOpacity
