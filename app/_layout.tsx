@@ -27,6 +27,10 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen
+        name="features/onboarding/screens/AddProjects"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="features/onboarding/createOrganization"
         options={{ headerShown: false }}
       />
