@@ -28,7 +28,7 @@ export default function VerifyEmailScreen() {
   );
 
   const handleContinue = async () => {
-    await AsyncStorage.setItem(ASYNCKEYS.ONBOARDING_STEP, "COMPLETED");
+    await AsyncStorage.setItem(ASYNCKEYS.ONBOARDING_STEP, "LOGIN_SCREEN");
     router.replace("/features/onboarding/Login");
   };
 
