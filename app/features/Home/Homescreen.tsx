@@ -121,9 +121,6 @@ export default function HomeScreen() {
 
       const data = response.data;
 
-      console.log(response.data);
-
-      // Combine owned and member organizations
       const allOrgs: Organization[] = [
         ...data.owned_organizations.map((org: Organization) => ({
           ...org,
@@ -136,6 +133,13 @@ export default function HomeScreen() {
       ];
 
       setOrganizations(allOrgs);
+
+      console.log(allOrgs)
+
+      if (allOrgs.length === 0) {
+        router.replace("/features/onboarding/createOrganization");
+        return;
+      }
 
       // Set the first organization as current if available
       if (allOrgs.length > 0 && !currentOrg) {
