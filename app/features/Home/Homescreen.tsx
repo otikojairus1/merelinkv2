@@ -1,23 +1,67 @@
+import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
+interface Organization {
+  id: number;
+  name: string;
+  description: string;
+  owner_id: number;
+  created_at: string;
+  updated_at: string;
+  role?: string;
+  pivot?: {
+    user_id: number;
+    organization_id: number;
+    role: string;
+    invited_at: string;
+    joined_at: string | null;
+    invitation_token: string;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
+interface Project {
+  id: string;
+  name: string;
+  progress: number;
+  lastUpdated: string;
+}
+
+interface Submission {
+  id: string;
+  project: string;
+  user: string;
+  time: string;
+  status: "Complete" | "Partial";
+}
+
 export default function HomeScreen() {
   const { colorScheme } = useColorScheme();
-  const [currentOrg, setCurrentOrg] = useState("Acme Corp");
+  const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
   const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Sample data
-  const recentProjects = [
+  const recentProjects: Project[] = [
     {
       id: "1",
       name: "Customer Feedback Q3",
@@ -38,7 +82,7 @@ export default function HomeScreen() {
     },
   ];
 
-  const recentSubmissions = [
+  const recentSubmissions: Submission[] = [
     {
       id: "1",
       project: "Customer Feedback",
@@ -62,11 +106,84 @@ export default function HomeScreen() {
     },
   ];
 
-  const organizations = [
-    { id: "1", name: "Acme Corp", role: "Admin" },
-    { id: "2", name: "Beta Analytics", role: "Member" },
-    { id: "3", name: "Gamma Labs", role: "Viewer" },
-  ];
+  const fetchOrganizations = async () => {
+    let token = await AsyncStorage.getItem(ASYNCKEYS.ACCESS_TOKEN);
+    try {
+      const response = await axios.get(`${BASE_URI}/api/organizations`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch organizations");
+      }
+
+      const data = response.data;
+
+      console.log(response.data);
+
+      // Combine owned and member organizations
+      const allOrgs: Organization[] = [
+        ...data.owned_organizations.map((org: Organization) => ({
+          ...org,
+          role: "owner",
+        })),
+        ...data.member_organizations.map((org: Organization) => ({
+          ...org,
+          role: org.pivot?.role || "member",
+        })),
+      ];
+
+      setOrganizations(allOrgs);
+
+      // Set the first organization as current if available
+      if (allOrgs.length > 0 && !currentOrg) {
+        setCurrentOrg(allOrgs[0]);
+      }
+
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrganizations();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchOrganizations();
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#000000"}
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Text className="text-red-500 dark:text-red-400 mb-4">{error}</Text>
+        <TouchableOpacity
+          onPress={fetchOrganizations}
+          className="px-4 py-2 bg-blue-500 rounded-lg"
+        >
+          <Text className="text-white">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
@@ -78,24 +195,26 @@ export default function HomeScreen() {
               Current Organization
             </Text>
             <TouchableOpacity
-              onPress={() => setShowOrgSwitcher(!showOrgSwitcher)}
+              onPress={() =>
+                organizations.length > 0 && setShowOrgSwitcher(!showOrgSwitcher)
+              }
               className="flex-row items-center"
             >
               <Text className="text-xl font-bold text-gray-900 dark:text-white mr-2">
-                {currentOrg}
+                {currentOrg?.name || "No organization selected"}
               </Text>
-              <MaterialCommunityIcons
-                name={showOrgSwitcher ? "chevron-up" : "chevron-down"}
-                size={24}
-                color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
-              />
+              {organizations.length > 0 && (
+                <MaterialCommunityIcons
+                  name={showOrgSwitcher ? "chevron-up" : "chevron-down"}
+                  size={24}
+                  color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
+                />
+              )}
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            onPress={() => {
-              router.push("/features/onboarding/screens/Profile");
-            }}
+            onPress={() => router.push("/features/onboarding/screens/Profile")}
           >
             <AntDesign
               name="user"
@@ -111,32 +230,39 @@ export default function HomeScreen() {
             <Text className="font-medium text-gray-900 dark:text-white mb-2">
               Your Organizations
             </Text>
-            {organizations.map((org) => (
-              <TouchableOpacity
-                key={org.id}
-                onPress={() => {
-                  setCurrentOrg(org.name);
-                  setShowOrgSwitcher(false);
-                }}
-                className={`py-3 px-2 rounded-md ${currentOrg === org.name ? "bg-blue-100 dark:bg-blue-900/30" : ""}`}
-              >
-                <View className="flex-row justify-between items-center">
-                  <Text
-                    className={`font-medium ${currentOrg === org.name ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`}
-                  >
-                    {org.name}
-                  </Text>
-                  <Text className="text-xs text-gray-500 dark:text-gray-400">
-                    {org.role}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+
+            {organizations.length === 0 ? (
+              <Text className="text-gray-500 dark:text-gray-400 py-3">
+                You don't belong to any organizations yet
+              </Text>
+            ) : (
+              organizations.map((org) => (
+                <TouchableOpacity
+                  key={org.id}
+                  onPress={() => {
+                    setCurrentOrg(org);
+                    setShowOrgSwitcher(false);
+                  }}
+                  className={`py-3 px-2 rounded-md ${currentOrg?.id === org.id ? "bg-blue-100 dark:bg-blue-900/30" : ""}`}
+                >
+                  <View className="flex-row justify-between items-center">
+                    <Text
+                      className={`font-medium ${currentOrg?.id === org.id ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`}
+                    >
+                      {org.name}
+                    </Text>
+                    <Text className="text-xs text-gray-500 dark:text-gray-400">
+                      {org.role === "owner" ? "Owner" : org.role}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
 
             <TouchableOpacity
-              onPress={() => {
-                router.push("/features/onboarding/createOrganization");
-              }}
+              onPress={() =>
+                router.push("/features/onboarding/createOrganization")
+              }
               className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600"
             >
               <MaterialCommunityIcons
@@ -149,34 +275,45 @@ export default function HomeScreen() {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/features/onboarding/OrganizationInvite");
-              }}
-              className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600"
-            >
-              <MaterialCommunityIcons
-                name="email-outline"
-                size={20}
-                color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
-              />
-              <Text className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
-                Invite Team Members
-              </Text>
-            </TouchableOpacity>
+            {currentOrg && (
+              <TouchableOpacity
+                onPress={() =>
+                  router.push("/features/onboarding/OrganizationInvite")
+                }
+                className="flex-row items-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-600"
+              >
+                <MaterialCommunityIcons
+                  name="email-outline"
+                  size={20}
+                  color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
+                />
+                <Text className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+                  Invite Team Members
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
 
       {/* Main Content */}
-      <ScrollView className="flex-1 px-6 pt-6">
+      <ScrollView
+        className="flex-1 px-6 pt-6"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colorScheme === "dark" ? "#ffffff" : "#000000"]}
+          />
+        }
+      >
         {/* Quick Actions */}
         <View className="flex-row justify-between mb-8">
           <TouchableOpacity
             className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center"
-            onPress={() => {
-              router.push("/features/onboarding/screens/AddProjects");
-            }}
+            onPress={() =>
+              router.push("/features/onboarding/screens/AddProjects")
+            }
           >
             <View className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mb-2">
               <MaterialCommunityIcons
@@ -191,9 +328,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {
-              router.push("/features/Home/Analytics");
-            }}
+            onPress={() => router.push("/features/Home/Analytics")}
             className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center"
           >
             <View className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full mb-2">
@@ -216,9 +351,7 @@ export default function HomeScreen() {
               Recent Projects
             </Text>
             <TouchableOpacity
-              onPress={() => {
-                router.push("/features/Home/ProjectList");
-              }}
+              onPress={() => router.push("/features/Home/ProjectList")}
             >
               <Text className="text-blue-600 dark:text-blue-400">View All</Text>
             </TouchableOpacity>
@@ -227,10 +360,7 @@ export default function HomeScreen() {
           <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
             {recentProjects.map((project) => (
               <TouchableOpacity
-                onPress={() => {
-                  // Navigate to project details
-                  router.push(`/features/Home/Analytics`);
-                }}
+                onPress={() => router.push(`/features/Home/Analytics`)}
                 key={project.id}
                 className="py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
               >
@@ -298,55 +428,57 @@ export default function HomeScreen() {
         </View>
 
         {/* Team Activity Section */}
-        <View className="mb-8">
-          <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Team Activity
-          </Text>
+        {currentOrg && (
+          <View className="mb-8">
+            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Team Activity
+            </Text>
 
-          <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-            <View className="flex-row items-start mb-4">
-              <View className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-3">
-                <MaterialCommunityIcons
-                  name="account-plus"
-                  size={20}
-                  color={colorScheme === "dark" ? "#A78BFA" : "#8B5CF6"}
-                />
+            <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <View className="flex-row items-start mb-4">
+                <View className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-3">
+                  <MaterialCommunityIcons
+                    name="account-plus"
+                    size={20}
+                    color={colorScheme === "dark" ? "#A78BFA" : "#8B5CF6"}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-medium text-gray-900 dark:text-white">
+                    New member joined
+                  </Text>
+                  <Text className="text-sm text-gray-500 dark:text-gray-400">
+                    Sarah K. accepted your invitation
+                  </Text>
+                  <Text className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    3 hours ago
+                  </Text>
+                </View>
               </View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-900 dark:text-white">
-                  New member joined
-                </Text>
-                <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  Sarah K. accepted your invitation
-                </Text>
-                <Text className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  3 hours ago
-                </Text>
-              </View>
-            </View>
 
-            <View className="flex-row items-start">
-              <View className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-3">
-                <MaterialCommunityIcons
-                  name="file-export"
-                  size={20}
-                  color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
-                />
-              </View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-900 dark:text-white">
-                  Data exported
-                </Text>
-                <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  Alex M. exported Customer Feedback results
-                </Text>
-                <Text className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  1 day ago
-                </Text>
+              <View className="flex-row items-start">
+                <View className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-3">
+                  <MaterialCommunityIcons
+                    name="file-export"
+                    size={20}
+                    color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-medium text-gray-900 dark:text-white">
+                    Data exported
+                  </Text>
+                  <Text className="text-sm text-gray-500 dark:text-gray-400">
+                    Alex M. exported Customer Feedback results
+                  </Text>
+                  <Text className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    1 day ago
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </View>
   );
