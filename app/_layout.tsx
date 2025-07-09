@@ -26,7 +26,16 @@ export default function RootLayout() {
 
   return (
     <Stack>
+      <Stack.Screen
+        name="features/onboarding/Signup"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="index" options={{ headerShown: false }} />
+
+      <Stack.Screen
+        name="features/onboarding/screens/SubmitForm"
+        options={{ headerShown: false }}
+      />
 
       <Stack.Screen
         name="features/onboarding/screens/AddForm"
@@ -49,10 +58,7 @@ export default function RootLayout() {
         name="features/onboarding/createOrganization"
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="features/onboarding/Signup"
-        options={{ headerShown: false }}
-      />
+
       <Stack.Screen
         name="features/onboarding/VerifyScreen"
         options={{ headerShown: false }}
