@@ -1,12 +1,16 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Link, useRouter } from "expo-router";
+import { MotiView } from "moti";
 import { useColorScheme } from "nativewind";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   ToastAndroid,
@@ -14,7 +18,7 @@ import {
   View,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import BASE_URI from "../../../BASE_URI"; // Adjust the import path as necessary
+import { ASYNCKEYS, BASE_URI } from "../../../BASE_URI";
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -27,6 +31,55 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        const onboardingStep = await AsyncStorage.getItem(
+          ASYNCKEYS.ONBOARDING_STEP
+        );
+        const user = await AsyncStorage.getItem(ASYNCKEYS.USER);
+
+        if (user) {
+          router.replace("/");
+          return;
+        }
+
+        switch (onboardingStep) {
+          case "VERIFY_SCREEN":
+            router.replace("/features/onboarding/VerifyScreen");
+            break;
+          case "LOGIN_SCREEN":
+            router.replace("/features/onboarding/Login");
+            break;
+          default:
+            // No onboarding step set, stay on signup screen
+            break;
+        }
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, []);
 
   const handleSignup = async () => {
     // Validate form
@@ -47,7 +100,6 @@ export default function SignupScreen() {
 
     setIsLoading(true);
     setError("");
-
     ToastAndroid.show("Creating account...", ToastAndroid.SHORT);
 
     try {
@@ -56,6 +108,9 @@ export default function SignupScreen() {
         email: formData.email,
         password: formData.password,
       });
+
+      // Save onboarding step before navigation
+      await AsyncStorage.setItem(ASYNCKEYS.ONBOARDING_STEP, "VERIFY_SCREEN");
       router.replace("/features/onboarding/VerifyScreen");
     } catch (err: any) {
       ToastAndroid.show(
@@ -70,7 +125,6 @@ export default function SignupScreen() {
     }
   };
 
-  // Custom outlined icons as components
   const OutlinedUser = () => (
     <Svg
       width={24}
@@ -132,151 +186,223 @@ export default function SignupScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1"
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
     >
-      <View className="flex-1 px-8 pt-16 bg-white dark:bg-gray-900">
-        {/* Decorative Header */}
-        <View className="items-center mb-10">
-          <View className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-full mb-4">
-            <MaterialCommunityIcons
-              name="chart-box-outline"
-              size={40}
-              color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
-            />
-          </View>
-          <Text className="text-4xl font-bold text-gray-900 dark:text-white text-center">
-            Join Merelink
-          </Text>
-          <Text className="text-lg text-gray-500 dark:text-gray-400 mt-2 text-center">
-            Your gateway to powerful data collection
-          </Text>
-        </View>
-
-        {/* Error Message */}
-        {error ? (
-          <View className="mb-4 p-3 w-fit rounded-lg">
-            <Text className="text-red-600 dark:text-red-400 text-center">
-              {error}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 500 }}
+          className="flex-1 px-8 pt-16 bg-white dark:bg-gray-900 pb-10"
+        >
+          {/* Decorative Header */}
+          <MotiView
+            from={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", delay: 100 }}
+            className="items-center mb-10"
+          >
+            <MotiView
+              from={{ rotate: "-10deg", scale: 0.8 }}
+              animate={{ rotate: "0deg", scale: 1 }}
+              transition={{ type: "spring", delay: 200 }}
+              className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-full mb-4"
+            >
+              <MaterialCommunityIcons
+                name="chart-box-outline"
+                size={40}
+                color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
+              />
+            </MotiView>
+            <Text className="text-4xl font-bold text-gray-900 dark:text-white text-center">
+              Join Merelink
             </Text>
-          </View>
-        ) : null}
+            <Text className="text-lg text-gray-500 dark:text-gray-400 mt-2 text-center">
+              Your gateway to powerful data collection
+            </Text>
+          </MotiView>
 
-        {/* Floating Form Container */}
-        <View className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-lg shadow-black/10 dark:shadow-black/20">
-          {/* Name Field */}
-          <View className="mb-6">
-            <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
-              <View className="mr-3">
-                <OutlinedUser />
-              </View>
-              <TextInput
-                placeholder="Full Name"
-                placeholderTextColor={
-                  colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
-                }
-                className="flex-1 text-gray-900 dark:text-white text-lg"
-                value={formData.fullname}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, fullname: text })
-                }
-              />
-            </View>
-          </View>
-
-          {/* Email Field */}
-          <View className="mb-6">
-            <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
-              <View className="mr-3">
-                <OutlinedEnvelope />
-              </View>
-              <TextInput
-                placeholder="Email Address"
-                placeholderTextColor={
-                  colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
-                }
-                keyboardType="email-address"
-                autoCapitalize="none"
-                className="flex-1 text-gray-900 dark:text-white text-lg"
-                value={formData.email}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, email: text })
-                }
-              />
-            </View>
-          </View>
-
-          {/* Password Field */}
-          <View className="mb-8">
-            <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
-              <View className="mr-3">
-                <OutlinedLock />
-              </View>
-              <TextInput
-                placeholder="Password"
-                placeholderTextColor={
-                  colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
-                }
-                secureTextEntry={!showPassword}
-                className="flex-1 text-gray-900 dark:text-white text-lg"
-                value={formData.password}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, password: text })
-                }
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <MaterialCommunityIcons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={22}
-                  color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Signup Button */}
-          <TouchableOpacity
-            onPress={handleSignup}
-            disabled={isLoading}
-            className="bg-blue-600 dark:bg-blue-500 py-4 rounded-xl shadow-md shadow-blue-500/20 dark:shadow-blue-900/30 flex-row justify-center items-center"
-          >
-            {isLoading ? (
-              <>
-                <ActivityIndicator
-                  color="#ffffff"
-                  size="small"
-                  className="mr-2"
-                />
-                <Text className="text-white text-center font-bold text-lg">
-                  Creating Account...
-                </Text>
-              </>
-            ) : (
-              <Text className="text-white text-center font-bold text-lg">
-                Create Account
+          {/* Error Message */}
+          {error && (
+            <MotiView
+              from={{ opacity: 0, translateY: -10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing" }}
+              className="mb-4 p-3 w-fit rounded-lg"
+            >
+              <Text className="text-red-600 dark:text-red-400 text-center">
+                {error}
               </Text>
-            )}
-          </TouchableOpacity>
-        </View>
+            </MotiView>
+          )}
 
-        {/* Footer */}
-        <View className="flex-row justify-center mt-8">
-          <Text className="text-gray-500 dark:text-gray-400">
-            Already registered?{" "}
-          </Text>
-          <Link
-            href="/features/onboarding/Login"
-            className="text-blue-600 dark:text-blue-400 font-medium"
+          {/* Floating Form Container */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", delay: 300 }}
+            className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-lg shadow-black/10 dark:shadow-black/20"
           >
-            Sign In
-          </Link>
-        </View>
+            {/* Name Field */}
+            <MotiView
+              from={{ opacity: 0, translateX: -10 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ type: "timing", delay: 400 }}
+              className="mb-6"
+            >
+              <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
+                <View className="mr-3">
+                  <OutlinedUser />
+                </View>
+                <TextInput
+                  placeholder="Full Name"
+                  placeholderTextColor={
+                    colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+                  }
+                  className="flex-1 text-gray-900 dark:text-white text-lg"
+                  value={formData.fullname}
+                  onChangeText={(text) =>
+                    setFormData({ ...formData, fullname: text })
+                  }
+                  returnKeyType="next"
+                  onSubmitEditing={() => {
+                    // Focus next input (email)
+                    this.emailInput.focus();
+                  }}
+                />
+              </View>
+            </MotiView>
 
-        {/* Decorative Bottom Element */}
-        <View className="absolute pointer-events-none bottom-0 left-0 right-0 items-center opacity-20 dark:opacity-30">
-          <Svg width={799.258} height={645.667} viewBox="0 0 799.258 645.667">
-            {/* ... (keep your existing SVG code) ... */}
-          </Svg>
-        </View>
-      </View>
+            {/* Email Field */}
+            <MotiView
+              from={{ opacity: 0, translateX: -10 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ type: "timing", delay: 450 }}
+              className="mb-6"
+            >
+              <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
+                <View className="mr-3">
+                  <OutlinedEnvelope />
+                </View>
+                <TextInput
+                  ref={(input) => {
+                    this.emailInput = input;
+                  }}
+                  placeholder="Email Address"
+                  placeholderTextColor={
+                    colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+                  }
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  className="flex-1 text-gray-900 dark:text-white text-lg"
+                  value={formData.email}
+                  onChangeText={(text) =>
+                    setFormData({ ...formData, email: text })
+                  }
+                  returnKeyType="next"
+                  onSubmitEditing={() => {
+                    // Focus next input (password)
+                    this.passwordInput.focus();
+                  }}
+                />
+              </View>
+            </MotiView>
+
+            {/* Password Field */}
+            <MotiView
+              from={{ opacity: 0, translateX: -10 }}
+              animate={{ opacity: 1, translateX: 0 }}
+              transition={{ type: "timing", delay: 500 }}
+              className="mb-8"
+            >
+              <View className="flex-row items-center border-b border-gray-200 dark:border-gray-600 pb-2">
+                <View className="mr-3">
+                  <OutlinedLock />
+                </View>
+                <TextInput
+                  ref={(input) => {
+                    this.passwordInput = input;
+                  }}
+                  placeholder="Password"
+                  placeholderTextColor={
+                    colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+                  }
+                  secureTextEntry={!showPassword}
+                  className="flex-1 text-gray-900 dark:text-white text-lg"
+                  value={formData.password}
+                  onChangeText={(text) =>
+                    setFormData({ ...formData, password: text })
+                  }
+                  returnKeyType="done"
+                  onSubmitEditing={handleSignup}
+                />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <MaterialCommunityIcons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
+                  />
+                </TouchableOpacity>
+              </View>
+            </MotiView>
+
+            {/* Signup Button */}
+            <MotiView
+              from={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", delay: 550 }}
+            >
+              <TouchableOpacity
+                onPress={handleSignup}
+                disabled={isLoading}
+                className="bg-blue-600 dark:bg-blue-500 py-4 rounded-xl shadow-md shadow-blue-500/20 dark:shadow-blue-900/30 flex-row justify-center items-center"
+              >
+                {isLoading ? (
+                  <>
+                    <ActivityIndicator
+                      color="#ffffff"
+                      size="small"
+                      className="mr-2"
+                    />
+                    <Text className="text-white text-center font-bold text-lg">
+                      Creating Account...
+                    </Text>
+                  </>
+                ) : (
+                  <Text className="text-white text-center font-bold text-lg">
+                    Create Account
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </MotiView>
+          </MotiView>
+
+          {/* Footer - Only show when keyboard is not visible */}
+          {!keyboardVisible && (
+            <MotiView
+              from={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ type: "timing", delay: 600 }}
+              className="flex-row justify-center mt-8"
+            >
+              <Text className="text-gray-500 dark:text-gray-400">
+                Already registered?{" "}
+              </Text>
+              <Link
+                href="/features/onboarding/Login"
+                className="text-blue-600 dark:text-blue-400 font-medium"
+              >
+                Sign In
+              </Link>
+            </MotiView>
+          )}
+        </MotiView>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
