@@ -2,18 +2,20 @@ import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import { Skeleton } from "moti/skeleton";
+import { useColorScheme } from "nativewind";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-
+import { Text, TouchableOpacity, View } from "react-native";
 type Project = {
   id: string;
   name: string;
   progress: number;
-  last_updated: string; // Assuming API returns this field
-  // Add other fields your API returns
+  last_updated: string;
 };
 
-const ProjectsSection = () => {
+const ProjectsSection = ({ refreshSync }) => {
+  const { colorScheme } = useColorScheme();
+
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,10 +69,9 @@ const ProjectsSection = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [refreshSync]);
 
   const getProjectProgress = (project) => {
-   
     const now = new Date();
     const start = new Date(project.start_date);
     const end = new Date(project.end_date);
@@ -100,8 +101,12 @@ const ProjectsSection = () => {
 
   if (loading) {
     return (
-      <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 items-center justify-center h-40">
-        <ActivityIndicator size="small" />
+      <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 ">
+        <Skeleton colorMode={colorScheme} width={250} height={15} />
+        <View className="h-2"></View>
+        <Skeleton colorMode={colorScheme} width={150} height={15} />
+        <View className="h-2"></View>
+        <Skeleton colorMode={colorScheme} height={10} width={250} />
       </View>
     );
   }

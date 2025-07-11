@@ -169,6 +169,8 @@ export default function HomeScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchOrganizations();
+    
+    
   };
 
   if (loading && !refreshing) {
@@ -318,7 +320,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[colorScheme === "dark" ? "#ffffff" : "#000000"]}
+            // colors={[colorScheme === "dark" ? "#ffffff" : "#000000"]}
           />
         }
       >
@@ -371,35 +373,7 @@ export default function HomeScreen() {
               <Text className="text-blue-600 dark:text-blue-400">View All</Text>
             </TouchableOpacity>
           </View>
-          <ProjectsSection/>
-
-          {/* <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-            {recentProjects.map((project) => (
-              <TouchableOpacity
-                onPress={() => router.push(`/features/Home/Analytics`)}
-                key={project.id}
-                className="py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
-              >
-                <View className="flex-row justify-between items-center mb-1">
-                  <Text className="font-medium text-gray-900 dark:text-white">
-                    {project.name}
-                  </Text>
-                  <Text className="text-sm text-gray-500 dark:text-gray-400">
-                    {project.lastUpdated}
-                  </Text>
-                </View>
-                <View className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mt-2">
-                  <View
-                    className="h-full bg-blue-500 rounded-full"
-                    style={{ width: `${project.progress}%` }}
-                  />
-                </View>
-                <Text className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {project.progress}% complete
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View> */}
+          <ProjectsSection refreshSync={refreshing} />
         </View>
 
         {/* Recent Submissions Section */}
