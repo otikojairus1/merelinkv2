@@ -148,6 +148,11 @@ export default function HomeScreen() {
 
       setError(null);
     } catch (err) {
+      if(err.message === "Request failed with status code 401") {
+        router.replace("/features/onboarding/Login");
+        return;
+
+      }
       setError(err.message);
     } finally {
       setLoading(false);
@@ -245,6 +250,10 @@ export default function HomeScreen() {
                   key={org.id}
                   onPress={() => {
                     setCurrentOrg(org);
+                    AsyncStorage.setItem(
+                      ASYNCKEYS.CURRENT_ORGANIZATION,
+                      JSON.stringify(org)
+                    );
                     setShowOrgSwitcher(false);
                   }}
                   className={`py-3 px-2 rounded-md ${currentOrg?.id === org.id ? "bg-blue-100 dark:bg-blue-900/30" : ""}`}

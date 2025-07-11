@@ -1,12 +1,19 @@
+import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator } from "react-native";
 import { useState } from "react";
-import Svg, { Circle, Path } from "react-native-svg";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 export default function CreateOrganizationScreen() {
   const { colorScheme } = useColorScheme();
