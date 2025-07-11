@@ -136,8 +136,6 @@ export default function HomeScreen() {
 
       setOrganizations(allOrgs);
 
-      console.log(allOrgs)
-
       if (allOrgs.length === 0) {
         router.replace("/features/onboarding/createOrganization");
         return;
