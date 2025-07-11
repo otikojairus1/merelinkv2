@@ -135,7 +135,15 @@ const ProjectsSection = ({ refreshSync }) => {
     <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
       {projects.map((project) => (
         <TouchableOpacity
-          onPress={() => router.push(`/features/Home/Analytics`)}
+          // onPress={() => router.push(`/features/Home/Analytics`)}
+          onPress={() =>
+            router.push({
+              pathname: "/features/Home/Analytics",
+              params: {
+                project: JSON.stringify(project),
+              },
+            })
+          }
           key={project.id}
           className="py-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
         >

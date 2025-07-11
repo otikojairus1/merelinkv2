@@ -5,7 +5,11 @@ import { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
+import { useLocalSearchParams } from "expo-router";
+
 const AnalyticsScreen = () => {
+  const { project } = useLocalSearchParams();
+  let parsedProject = JSON.parse(project as string);
   const { colorScheme } = useColorScheme();
   const textColor = colorScheme === "dark" ? "white" : "black";
   const cardBg = colorScheme === "dark" ? "bg-gray-800" : "bg-white";
@@ -83,12 +87,12 @@ const AnalyticsScreen = () => {
     { value: 30000, color: "#EF4444", text: "Local" },
   ];
   const sampleProject = {
-    id: "1",
-    name: "Urban Food Initiative",
-    description: "Providing meals to low-income families in urban areas",
-    totalMeals: 12500,
-    familiesReached: 3200,
-    funding: 75000,
+    id: parsedProject.id || "1",
+    name: parsedProject.name || "Urban Food Initiative",
+    description: parsedProject.description || "Providing meals to low-income families in urban areas",
+    totalMeals: parsedProject.totalMeals || 12500,
+    familiesReached: parsedProject.familiesReached || 3200,
+    funding: parsedProject.funding || 75000,
   };
 
   const handleFilterChange = (filters) => {
