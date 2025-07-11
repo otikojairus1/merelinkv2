@@ -89,7 +89,9 @@ const AnalyticsScreen = () => {
   const sampleProject = {
     id: parsedProject.id || "1",
     name: parsedProject.name || "Urban Food Initiative",
-    description: parsedProject.description || "Providing meals to low-income families in urban areas",
+    description:
+      parsedProject.description ||
+      "Providing meals to low-income families in urban areas",
     totalMeals: parsedProject.totalMeals || 12500,
     familiesReached: parsedProject.familiesReached || 3200,
     funding: parsedProject.funding || 75000,
@@ -322,7 +324,8 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
   };
 
   const handleAssignLeader = () => {
-    Alert.alert("Assign Leader", `Assign project leader for ${project.name}`);
+    router.push("/features/onboarding/screens/ProjectLeader");
+
     // Implement leader assignment logic
     setShowActions(false);
   };
@@ -415,51 +418,49 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
       {showActions && (
         <View className={`mt-3 p-3 rounded-lg ${buttonBg}`}>
           {/* <Link href={`/projects/${project.id}/create-form`} asChild> */}
-            <TouchableOpacity
-              className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
-              onPress={handleCreateForm}
-            >
-              <MaterialCommunityIcons
-                name="plus-circle-outline"
-                size={20}
-                color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
-              />
-              <Text className="ml-2 text-blue-600 dark:text-blue-400">
-                Create New Form
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
+            onPress={handleCreateForm}
+          >
+            <MaterialCommunityIcons
+              name="plus-circle-outline"
+              size={20}
+              color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
+            />
+            <Text className="ml-2 text-blue-600 dark:text-blue-400">
+              Create New Form
+            </Text>
+          </TouchableOpacity>
           {/* </Link> */}
           {/* <Link href={`/projects/${project.id}/create-form`} asChild> */}
-            <TouchableOpacity
-              className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
-              onPress={handleCreateForm}
-            >
-              <MaterialCommunityIcons
-                name="plus-circle-outline"
-                size={20}
-                color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
-              />
-              <Text className="ml-2 text-blue-600 dark:text-blue-400">
-                Submit Form
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-blue-100 dark:bg-blue-900/30"
+            onPress={handleCreateForm}
+          >
+            <MaterialCommunityIcons
+              name="plus-circle-outline"
+              size={20}
+              color={colorScheme === "dark" ? "#60A5FA" : "#3B82F6"}
+            />
+            <Text className="ml-2 text-blue-600 dark:text-blue-400">
+              Submit Form
+            </Text>
+          </TouchableOpacity>
           {/* </Link> */}
 
-          <Link href={`/projects/${project.id}/assign-leader`} asChild>
-            <TouchableOpacity
-              className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-green-100 dark:bg-green-900/30"
-              onPress={handleAssignLeader}
-            >
-              <MaterialCommunityIcons
-                name="account-plus"
-                size={20}
-                color={colorScheme === "dark" ? "#34D399" : "#10B981"}
-              />
-              <Text className="ml-2 text-green-600 dark:text-green-400">
-                Project Leader Form
-              </Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity
+            className="flex-row items-center py-2 px-3 mb-2 rounded-md bg-green-100 dark:bg-green-900/30"
+            onPress={handleAssignLeader}
+          >
+            <MaterialCommunityIcons
+              name="account-plus"
+              size={20}
+              color={colorScheme === "dark" ? "#34D399" : "#10B981"}
+            />
+            <Text className="ml-2 text-green-600 dark:text-green-400">
+              Project Leader Form
+            </Text>
+          </TouchableOpacity>
 
           <Link href={`/projects/${project.id}/submissions`} asChild>
             <TouchableOpacity

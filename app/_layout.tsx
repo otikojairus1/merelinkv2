@@ -25,64 +25,22 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="features/onboarding/Signup"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-
-      <Stack.Screen
-        name="features/onboarding/screens/SubmitForm"
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="features/onboarding/screens/AddForm"
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="features/onboarding/screens/ManageUsers"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/screens/Profile"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/screens/AddProjects"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/createOrganization"
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="features/onboarding/VerifyScreen"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/Login"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/ResetPassword"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/onboarding/OrganizationInvite"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/Home/Analytics"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="features/Home/ProjectList"
-        options={{ headerShown: false }}
-      />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="features/onboarding/Signup" />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="features/onboarding/screens/SubmitForm" />
+      <Stack.Screen name="features/onboarding/screens/AddForm" />
+      <Stack.Screen name="features/onboarding/screens/ManageUsers" />
+      <Stack.Screen name="features/onboarding/screens/Profile" />
+      <Stack.Screen name="features/onboarding/screens/AddProjects" />
+      <Stack.Screen name="features/onboarding/createOrganization" />
+      <Stack.Screen name="features/onboarding/VerifyScreen" />
+      <Stack.Screen name="features/onboarding/Login" />
+      <Stack.Screen name="features/onboarding/ResetPassword" />
+      <Stack.Screen name="features/onboarding/OrganizationInvite" />
+      <Stack.Screen name="features/Home/Analytics" />
+      <Stack.Screen name="features/Home/ProjectList" />
+      <Stack.Screen name="/features/onboarding/screens/ProjectLeader" />
     </Stack>
   );
 }
