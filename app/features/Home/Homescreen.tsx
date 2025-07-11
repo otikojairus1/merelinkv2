@@ -15,6 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ProjectsList from "../onboarding/components/ProjectSectionHomescreen";
+import ProjectsSection from "../onboarding/components/ProjectSectionHomescreen";
 
 interface Organization {
   id: number;
@@ -369,8 +371,9 @@ export default function HomeScreen() {
               <Text className="text-blue-600 dark:text-blue-400">View All</Text>
             </TouchableOpacity>
           </View>
+          <ProjectsSection/>
 
-          <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          {/* <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
             {recentProjects.map((project) => (
               <TouchableOpacity
                 onPress={() => router.push(`/features/Home/Analytics`)}
@@ -396,7 +399,7 @@ export default function HomeScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </View> */}
         </View>
 
         {/* Recent Submissions Section */}
@@ -496,3 +499,6 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+
+
