@@ -462,7 +462,7 @@ export default function AddProjectScreen() {
                 mode="date"
                 display="default"
                 onChange={handleStartDateChange}
-                minimumDate={new Date()}
+                // minimumDate={new Date()}
               />
             )}
           </View>
@@ -491,7 +491,7 @@ export default function AddProjectScreen() {
                 mode="date"
                 display="default"
                 onChange={handleEndDateChange}
-                minimumDate={startDate || new Date()}
+                // minimumDate={startDate || new Date()}
               />
             )}
           </View>
