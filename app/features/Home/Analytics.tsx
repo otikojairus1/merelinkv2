@@ -6,6 +6,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BarChart, LineChart, PieChart } from "react-native-gifted-charts";
 
 import { useLocalSearchParams } from "expo-router";
+import { navigate } from "expo-router/build/global-state/routing";
 
 const AnalyticsScreen = () => {
   const { project } = useLocalSearchParams();
@@ -488,11 +489,19 @@ const ProjectSummaryCard = ({ project, onFilterChange }) => {
           </TouchableOpacity>
         </Link>
 
-        <Link href={`/projects/${project.id}/details`} asChild>
-          <TouchableOpacity className={`py-2 px-3 rounded-md ${buttonBg}`}>
-            <Text className={`text-sm text-${textColor}`}>View Details</Text>
+      
+          <TouchableOpacity 
+          onPress={()=>{
+          
+            router.push({
+              pathname: "/features/onboarding/screens/EditProject",
+              params: { projectId: project.id },
+            });
+          }}
+          className={`py-2 px-3 rounded-md ${buttonBg}`}>
+            <Text className={`text-sm text-${textColor}`}>Edit Project Details</Text>
           </TouchableOpacity>
-        </Link>
+        
       </View>
     </View>
   );

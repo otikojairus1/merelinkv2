@@ -41,6 +41,7 @@ export default function RootLayout() {
       <Stack.Screen name="features/Home/Analytics" />
       <Stack.Screen name="features/Home/ProjectList" />
       <Stack.Screen name="/features/onboarding/screens/ProjectLeader" />
+      <Stack.Screen name="/features/onboarding/screens/EditProject" />
     </Stack>
   );
 }
