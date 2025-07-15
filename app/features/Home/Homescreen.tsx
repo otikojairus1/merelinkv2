@@ -15,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ProjectsList from "../onboarding/components/ProjectSectionHomescreen";
 import ProjectsSection from "../onboarding/components/ProjectSectionHomescreen";
 
 interface Organization {
@@ -148,10 +147,9 @@ export default function HomeScreen() {
 
       setError(null);
     } catch (err) {
-      if(err.message === "Request failed with status code 401") {
+      if (err.message === "Request failed with status code 401") {
         router.replace("/features/onboarding/Login");
         return;
-
       }
       setError(err.message);
     } finally {
@@ -167,8 +165,6 @@ export default function HomeScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchOrganizations();
-    
-    
   };
 
   if (loading && !refreshing) {
@@ -223,16 +219,31 @@ export default function HomeScreen() {
               )}
             </TouchableOpacity>
           </View>
+          <View className="flex-row gap-5">
+            <TouchableOpacity
+              onPress={() =>
+                router.push("/features/onboarding/screens/OrganizationInvites")
+              }
+            >
+              <AntDesign
+                name="bells"
+                size={20}
+                color={colorScheme === "dark" ? "#FBBF24" : "#6B7280"}
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.push("/features/onboarding/screens/Profile")}
-          >
-            <AntDesign
-              name="user"
-              size={24}
-              color={colorScheme === "dark" ? "#FBBF24" : "#6B7280"}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                router.push("/features/onboarding/screens/Profile")
+              }
+            >
+              <AntDesign
+                name="user"
+                size={20}
+                color={colorScheme === "dark" ? "#FBBF24" : "#6B7280"}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Organization Switcher */}
@@ -471,6 +482,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-
-
