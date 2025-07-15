@@ -1,12 +1,15 @@
+import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { Link } from "expo-router";
 import { MotiText, MotiView } from "moti";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
-
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   Text,
   TextInput,
   TouchableOpacity,
@@ -15,54 +18,76 @@ import {
 import { Easing } from "react-native-reanimated";
 
 const OrganizationInviteScreen = () => {
+  AsyncStorage.getItem(ASYNCKEYS.CURRENT_ORGANIZATION).then((val) => {
+    setOrgid(JSON.parse(val).id);
+  });
   const { colorScheme } = useColorScheme();
   const [email, setEmail] = useState("");
+  const [orgid, setOrgid] = useState(null);
   const [role, setRole] = useState("member");
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [status, setStatus] = useState<
-    "idle" | "searching" | "found" | "inviting" | "success"
-  >("idle"); // 'idle' | 'searching' | 'found' | 'inviting' | 'success'
-  type User = {
-    id: string;
-    name: string;
-    avatar: string;
-    currentOrgs: string[];
-  };
-  const [user, setUser] = useState<User | null>(null);
+    "idle" | "searching" | "inviting" | "success" | "error"
+  >("idle");
+  const [error, setError] = useState("");
 
   const textColor = colorScheme === "dark" ? "text-white" : "text-black";
   const cardBg = colorScheme === "dark" ? "bg-gray-800" : "bg-white";
   const inputBg = colorScheme === "dark" ? "bg-gray-700" : "bg-gray-100";
   const buttonBg = colorScheme === "dark" ? "bg-blue-600" : "bg-blue-500";
-
-  const handleSearch = async () => {
-    setStatus("searching");
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Mock response
-    const mockUser = {
-      id: "123",
-      name: "John Doe",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      currentOrgs: ["Acme Inc"],
-    };
-
-    setUser(mockUser);
-    setStatus("found");
-  };
+  const dropdownBg = colorScheme === "dark" ? "bg-gray-700" : "bg-gray-100";
+  const dropdownBorder =
+    colorScheme === "dark" ? "border-gray-600" : "border-gray-300";
 
   const handleSendInvite = async () => {
+    if (!email.includes("@")) {
+      setError("Please enter a valid email");
+      return;
+    }
+
     setStatus("inviting");
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setStatus("success");
+    try {
+      const token = await AsyncStorage.getItem(ASYNCKEYS.ACCESS_TOKEN);
+      if (!token) throw new Error("No access token found");
+
+      const response = await axios.post(
+        `${BASE_URI}/api/organizations/${orgid}/invite`,
+        { email, role },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        setStatus("success");
+      } else {
+        throw new Error(response.data?.message || "Failed to send invitation");
+      }
+    } catch (err: any) {
+      console.error("Error sending invitation:", err);
+      setStatus("error");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to send invitation"
+      );
+    }
   };
 
   const resetFlow = () => {
     setEmail("");
-    setUser(null);
+    setRole("member");
+    setError("");
     setStatus("idle");
   };
+
+  const roles = [
+    { value: "member", label: "Member" },
+    { value: "admin", label: "Admin" },
+  ];
 
   return (
     <KeyboardAvoidingView
@@ -78,7 +103,7 @@ const OrganizationInviteScreen = () => {
           Invite to Organization
         </Text>
         <Text className={`text-gray-500 dark:text-gray-400 mb-6`}>
-          Add existing users to your organization
+          Send an invitation to join your organization
         </Text>
       </MotiView>
 
@@ -122,7 +147,7 @@ const OrganizationInviteScreen = () => {
             transition={{ delay: 300 }}
             className="text-gray-500 dark:text-gray-400 mt-2 text-center"
           >
-            {user ? user.name : "The user"} has been invited to join as{" "}
+            An invitation has been sent to {email} as{" "}
             {role === "admin" ? "an admin" : "a member"}
           </MotiText>
 
@@ -152,15 +177,8 @@ const OrganizationInviteScreen = () => {
         </MotiView>
       ) : (
         <>
-          {/* Search Phase */}
-          <MotiView
-            animate={{
-              opacity: status === "found" ? 0 : 1,
-              height: status === "found" ? 0 : "auto",
-              translateY: status === "found" ? -20 : 0,
-            }}
-            transition={{ type: "timing", duration: 400 }}
-          >
+          {/* Email Input */}
+          <MotiView>
             <Text className={`text-sm font-medium mb-2 ${textColor}`}>
               User Email
             </Text>
@@ -179,140 +197,112 @@ const OrganizationInviteScreen = () => {
                 }
                 className={`flex-1 ml-2 ${textColor}`}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setError("");
+                }}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                editable={status === "idle"}
+                editable={status !== "inviting"}
               />
-              {status === "searching" && (
-                <MotiView
-                  animate={{ rotate: "360deg" }}
-                  transition={{
-                    repeatReverse: false,
-                    repeat: Infinity,
-                    duration: 1000,
-                    easing: Easing.linear,
-                  }}
+            </View>
+
+            {/* Role Dropdown */}
+            <Text className={`text-sm font-medium mb-2 ${textColor}`}>
+              Assign Role
+            </Text>
+            <View className="mb-6">
+              <Pressable
+                onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+                className={`flex-row items-center justify-between ${inputBg} rounded-lg px-4 py-3 border ${dropdownBorder}`}
+              >
+                <Text className={textColor}>
+                  {role === "admin" ? "Admin" : "Member"}
+                </Text>
+                <MaterialCommunityIcons
+                  name={showRoleDropdown ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
+                />
+              </Pressable>
+
+              {showRoleDropdown && (
+                <View
+                  className={`mt-1 ${dropdownBg} rounded-lg border ${dropdownBorder} overflow-hidden`}
                 >
-                  <MaterialCommunityIcons
-                    name="loading"
-                    size={20}
-                    color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
-                  />
-                </MotiView>
+                  {roles.map((r) => (
+                    <Pressable
+                      key={r.value}
+                      onPress={() => {
+                        setRole(r.value);
+                        setShowRoleDropdown(false);
+                      }}
+                      className={`px-4 py-3 ${role === r.value ? "bg-blue-100 dark:bg-blue-900/30" : ""}`}
+                    >
+                      <Text
+                        className={`${textColor} ${
+                          role === r.value ? "font-medium" : ""
+                        }`}
+                      >
+                        {r.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
               )}
             </View>
 
-            {status === "idle" && (
+            {/* Error Message */}
+            {(error || status === "error") && (
               <MotiView
-                from={{ opacity: 0, translateY: 20 }}
-                animate={{ opacity: 1, translateY: 0 }}
+                from={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-100 dark:bg-red-900/20 p-3 rounded-lg mb-4"
               >
-                <TouchableOpacity
-                  onPress={handleSearch}
-                  disabled={!email.includes("@")}
-                  className={`py-3 rounded-lg ${buttonBg} items-center justify-center opacity-${!email.includes("@") ? "50" : "100"}`}
-                >
-                  <Text className="text-white font-medium">Find User</Text>
-                </TouchableOpacity>
+                <Text className="text-red-600 dark:text-red-400">
+                  {error || "Failed to send invitation"}
+                </Text>
               </MotiView>
             )}
-          </MotiView>
 
-          {/* User Found Phase */}
-          {status === "found" && user && (
+            {/* Submit Button */}
             <MotiView
               from={{ opacity: 0, translateY: 20 }}
               animate={{ opacity: 1, translateY: 0 }}
-              transition={{ type: "spring" }}
-              className={`p-4 rounded-xl ${cardBg} shadow-sm border ${colorScheme === "dark" ? "border-gray-700" : "border-gray-200"} mb-6`}
             >
-              <View className="flex-row items-center mb-4">
-                <View className="w-12 h-12 rounded-full bg-gray-300 mr-3 overflow-hidden">
-                  {/* User avatar would go here */}
-                </View>
-                <View>
-                  <Text className={`text-lg font-bold ${textColor}`}>
-                    {user.name}
-                  </Text>
-                  <Text className="text-gray-500 dark:text-gray-400 text-sm">
-                    {email}
-                  </Text>
-                </View>
-              </View>
-
-              <Text className={`text-sm font-medium mb-2 ${textColor}`}>
-                Current Organizations
-              </Text>
-              <View className="flex-row flex-wrap mb-4">
-                {user.currentOrgs.map((org, index) => (
-                  <View
-                    key={index}
-                    className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full mr-2 mb-2"
+              <TouchableOpacity
+                onPress={handleSendInvite}
+                disabled={status === "inviting" || !email.includes("@")}
+                className={`py-3 rounded-lg ${buttonBg} items-center justify-center ${
+                  status === "inviting" || !email.includes("@")
+                    ? "opacity-70"
+                    : ""
+                }`}
+              >
+                {status === "inviting" ? (
+                  <MotiView
+                    animate={{ rotate: "360deg" }}
+                    transition={{
+                      repeatReverse: false,
+                      repeat: Infinity,
+                      duration: 1000,
+                      easing: Easing.linear,
+                    }}
                   >
-                    <Text className="text-xs text-gray-800 dark:text-gray-200">
-                      {org}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-
-              <Text className={`text-sm font-medium mb-2 ${textColor}`}>
-                Assign Role
-              </Text>
-              <View className="flex-row border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
-                {["member", "admin"].map((r) => (
-                  <TouchableOpacity
-                    key={r}
-                    onPress={() => setRole(r)}
-                    className={`flex-1 py-2 items-center ${role === r ? "bg-blue-100 dark:bg-blue-900/30" : ""}`}
-                  >
-                    <Text
-                      className={`text-sm ${role === r ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"}`}
-                    >
-                      {r === "admin" ? "Admin" : "Member"}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <View className="flex-row">
-                <TouchableOpacity
-                  onPress={() => {
-                    setUser(null);
-                    setStatus("idle");
-                  }}
-                  className="flex-1 py-2 px-4 rounded-lg border border-gray-200 dark:border-gray-700 mr-2 items-center"
-                >
-                  <Text className={`${textColor} font-medium`}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleSendInvite}
-                  className={`flex-1 py-2 px-4 rounded-lg ${buttonBg} items-center`}
-                >
-                  {status === "inviting" ? (
-                    <MotiView
-                      animate={{ rotate: "360deg" }}
-                      transition={{
-                        repeatReverse: false,
-                        repeat: Infinity,
-                        duration: 1000,
-                        easing: Easing.linear,
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name="loading"
-                        size={20}
-                        color="white"
-                      />
-                    </MotiView>
-                  ) : (
-                    <Text className="text-white font-medium">Send Invite</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
+                    <MaterialCommunityIcons
+                      name="loading"
+                      size={20}
+                      color="white"
+                    />
+                  </MotiView>
+                ) : (
+                  <Text className="text-white font-medium">
+                    Send Invitation
+                  </Text>
+                )}
+              </TouchableOpacity>
             </MotiView>
-          )}
+          </MotiView>
         </>
       )}
     </KeyboardAvoidingView>
