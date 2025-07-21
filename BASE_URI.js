@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Base API URL
-// const BASE_URI = "https://merelink.io/merelinkv2-api/public";
+const BASE_URI = "https://merelink.io/merelinkv2-api/public";
 
-const BASE_URI = "https://5a166b335a13.ngrok-free.app";
+// const BASE_URI = "https://5a166b335a13.ngrok-free.app";
 
 // AsyncStorage keys
 const ASYNCKEYS = {
