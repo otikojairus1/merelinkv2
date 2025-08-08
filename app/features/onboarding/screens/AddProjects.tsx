@@ -48,6 +48,15 @@ export default function AddProjectScreen() {
   const [mediaLink, setMediaLink] = useState("");
   const [countryCode, setCountryCode] = useState<CountryCode>("KE");
   const [loading, setLoading] = useState(false);
+  const [totalBudget, setTotalBudget] = useState("");
+  const [foodBudget, setFoodBudget] = useState("");
+  const [foodPrice, setFoodPrice] = useState("");
+  const [totalConsignmentWeight, setTotalConsignmentWeight] = useState("");
+  const [foodPackageType, setFoodPackageType] = useState("");
+  const [foodPackageSizeValue, setFoodPackageSizeValue] = useState("");
+  const [estimatedAidImpact, setEstimatedAidImpact] = useState("");
+  const [baseline, setBaseline] = useState("");
+  const [target, setTarget] = useState("");
 
   // Date picker states
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -130,9 +139,22 @@ export default function AddProjectScreen() {
           start_date: startDate?.toISOString().split("T")[0] || null,
           end_date: endDate?.toISOString().split("T")[0] || null,
           duration: duration ? parseInt(duration) : null,
-          funding,
+          funding: funding ? parseFloat(funding) : null,
           foodlbs: foodlbs ? parseInt(foodlbs) : null,
           mediaLink,
+          total_budget: totalBudget ? parseFloat(totalBudget) : null,
+          food_budget: foodBudget ? parseFloat(foodBudget) : null,
+          food_price: foodPrice ? parseFloat(foodPrice) : null,
+          total_consignent_weight: totalConsignmentWeight
+            ? parseFloat(totalConsignmentWeight)
+            : null,
+          food_package_type: foodPackageType,
+          food_package_size_value: foodPackageSizeValue
+            ? parseFloat(foodPackageSizeValue)
+            : null,
+          estimated_aid_impact: estimatedAidImpact,
+          base_line: baseline,
+          target: target,
         },
         {
           headers: {
@@ -462,7 +484,6 @@ export default function AddProjectScreen() {
                 mode="date"
                 display="default"
                 onChange={handleStartDateChange}
-                // minimumDate={new Date()}
               />
             )}
           </View>
@@ -491,7 +512,6 @@ export default function AddProjectScreen() {
                 mode="date"
                 display="default"
                 onChange={handleEndDateChange}
-                // minimumDate={startDate || new Date()}
               />
             )}
           </View>
@@ -552,6 +572,183 @@ export default function AddProjectScreen() {
               onChangeText={setFoodlbs}
               keyboardType="numeric"
               ref={(el) => (inputRefs.current["foodlbs"] = el)}
+              onSubmitEditing={() => focusNextField("totalBudget")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Total Budget */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Total Budget ($USD)
+            </Text>
+            <TextInput
+              placeholder="Enter Total Budget"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={totalBudget}
+              onChangeText={setTotalBudget}
+              keyboardType="numeric"
+              ref={(el) => (inputRefs.current["totalBudget"] = el)}
+              onSubmitEditing={() => focusNextField("foodBudget")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Food Budget */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Food Budget ($USD)
+            </Text>
+            <TextInput
+              placeholder="Enter Food Budget"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={foodBudget}
+              onChangeText={setFoodBudget}
+              keyboardType="numeric"
+              ref={(el) => (inputRefs.current["foodBudget"] = el)}
+              onSubmitEditing={() => focusNextField("foodPrice")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Food Price */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Food Price ($USD)
+            </Text>
+            <TextInput
+              placeholder="Enter Food Price"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={foodPrice}
+              onChangeText={setFoodPrice}
+              keyboardType="numeric"
+              ref={(el) => (inputRefs.current["foodPrice"] = el)}
+              onSubmitEditing={() => focusNextField("totalConsignmentWeight")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Total Consignment Weight */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Total Consignment Weight (kg)
+            </Text>
+            <TextInput
+              placeholder="Enter Total Weight"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={totalConsignmentWeight}
+              onChangeText={setTotalConsignmentWeight}
+              keyboardType="numeric"
+              ref={(el) => (inputRefs.current["totalConsignmentWeight"] = el)}
+              onSubmitEditing={() => focusNextField("foodPackageType")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Food Package Type */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Food Package Type
+            </Text>
+            <TextInput
+              placeholder="e.g. Box, Bag"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={foodPackageType}
+              onChangeText={setFoodPackageType}
+              ref={(el) => (inputRefs.current["foodPackageType"] = el)}
+              onSubmitEditing={() => focusNextField("foodPackageSizeValue")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Food Package Size Value */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Food Package Size Value
+            </Text>
+            <TextInput
+              placeholder="Enter Package Size Value"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={foodPackageSizeValue}
+              onChangeText={setFoodPackageSizeValue}
+              keyboardType="numeric"
+              ref={(el) => (inputRefs.current["foodPackageSizeValue"] = el)}
+              onSubmitEditing={() => focusNextField("estimatedAidImpact")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Estimated Aid Impact */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Estimated Aid Impact
+            </Text>
+            <TextInput
+              keyboardType="numeric"
+              placeholder="Enter Estimated Impact"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={estimatedAidImpact}
+              onChangeText={setEstimatedAidImpact}
+              ref={(el) => (inputRefs.current["estimatedAidImpact"] = el)}
+              onSubmitEditing={() => focusNextField("baseline")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Baseline */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Baseline
+            </Text>
+            <TextInput
+              placeholder="Enter Baseline"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={baseline}
+              onChangeText={setBaseline}
+              ref={(el) => (inputRefs.current["baseline"] = el)}
+              onSubmitEditing={() => focusNextField("target")}
+              returnKeyType="next"
+            />
+          </View>
+
+          {/* Target */}
+          <View className="mb-6">
+            <Text className="text-gray-900 dark:text-white text-sm font-medium mb-2">
+              Target
+            </Text>
+            <TextInput
+              placeholder="Enter Target"
+              placeholderTextColor={
+                colorScheme === "dark" ? "#9CA3AF" : "#6B7280"
+              }
+              className="border-b border-gray-200 dark:border-gray-600 pb-2 text-gray-900 dark:text-white text-lg"
+              value={target}
+              onChangeText={setTarget}
+              ref={(el) => (inputRefs.current["target"] = el)}
               onSubmitEditing={() => focusNextField("mediaLink")}
               returnKeyType="next"
             />

@@ -1,5 +1,5 @@
 import { ASYNCKEYS, BASE_URI } from "@/BASE_URI";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -84,27 +84,27 @@ export default function HomeScreen() {
   ];
 
   const recentSubmissions: Submission[] = [
-    {
-      id: "1",
-      project: "Customer Feedback",
-      user: "John D.",
-      time: "10:42 AM",
-      status: "Complete",
-    },
-    {
-      id: "2",
-      project: "Product Survey",
-      user: "Sarah K.",
-      time: "Yesterday",
-      status: "Partial",
-    },
-    {
-      id: "3",
-      project: "Market Research",
-      user: "Alex M.",
-      time: "2 days ago",
-      status: "Complete",
-    },
+    // {
+    //   id: "1",
+    //   project: "Customer Feedback",
+    //   user: "John D.",
+    //   time: "10:42 AM",
+    //   status: "Complete",
+    // },
+    // {
+    //   id: "2",
+    //   project: "Product Survey",
+    //   user: "Sarah K.",
+    //   time: "Yesterday",
+    //   status: "Partial",
+    // },
+    // {
+    //   id: "3",
+    //   project: "Market Research",
+    //   user: "Alex M.",
+    //   time: "2 days ago",
+    //   status: "Complete",
+    // },
   ];
 
   const fetchOrganizations = async () => {
@@ -135,10 +135,10 @@ export default function HomeScreen() {
 
       setOrganizations(allOrgs);
 
-      if (allOrgs.length === 0) {
-        router.replace("/features/onboarding/createOrganization");
-        return;
-      }
+      // if (allOrgs.length === 0) {
+      //   router.replace("/features/onboarding/createOrganization");
+      //   return;
+      // }
 
       // Set the first organization as current if available
       if (allOrgs.length > 0 && !currentOrg) {
@@ -232,9 +232,10 @@ export default function HomeScreen() {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() =>
-                router.push("/features/onboarding/screens/Profile")
+            {/* <TouchableOpacity
+              onPress={
+                () => {}
+                // router.push("/features/onboarding/screens/Profile")
               }
             >
               <AntDesign
@@ -242,7 +243,7 @@ export default function HomeScreen() {
                 size={20}
                 color={colorScheme === "dark" ? "#FBBF24" : "#6B7280"}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
@@ -354,7 +355,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/features/Home/Analytics")}
+            onPress={() => router.push("/features/onboarding/screens/ProjectDistribution")}
             className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm w-[48%] items-center"
           >
             <View className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full mb-2">
@@ -365,7 +366,7 @@ export default function HomeScreen() {
               />
             </View>
             <Text className="font-medium text-gray-900 dark:text-white">
-              View Analytics
+              Add Distribution
             </Text>
           </TouchableOpacity>
         </View>
@@ -397,7 +398,7 @@ export default function HomeScreen() {
           </View>
 
           <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-            <FlatList
+            {/* <FlatList
               data={recentSubmissions}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
@@ -422,7 +423,51 @@ export default function HomeScreen() {
                   </View>
                 </View>
               )}
-            />
+            /> */}
+            {recentSubmissions.length > 0 ? (
+              <FlatList
+                data={recentSubmissions}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <View className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex-row justify-between items-center">
+                    <View>
+                      <Text className="font-medium text-gray-900 dark:text-white">
+                        {item.project}
+                      </Text>
+                      <Text className="text-sm text-gray-500 dark:text-gray-400">
+                        {item.user} • {item.time}
+                      </Text>
+                    </View>
+                    <View
+                      className={`px-2 py-1 rounded-full ${item.status === "Complete" ? "bg-green-100 dark:bg-green-900/30" : "bg-yellow-100 dark:bg-yellow-900/30"}`}
+                    >
+                      <Text
+                        className={`text-xs font-medium ${item.status === "Complete" ? "text-green-800 dark:text-green-400" : "text-yellow-800 dark:text-yellow-400"}`}
+                      >
+                        {item.status}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              />
+            ) : (
+              <View className="py-8 px-4 items-center justify-center">
+                <View className="bg-gray-100 dark:bg-gray-800 p-4 rounded-full mb-3">
+                  <FontAwesome5
+                    name="wpforms"
+                    size={24}
+                    color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
+                  />
+                </View>
+                <Text className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  No Submissions Yet
+                </Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
+                  When students submit their work, it will appear here
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -433,7 +478,7 @@ export default function HomeScreen() {
               Team Activity
             </Text>
 
-            <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+            {/* <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
               <View className="flex-row items-start mb-4">
                 <View className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-3">
                   <MaterialCommunityIcons
@@ -474,6 +519,23 @@ export default function HomeScreen() {
                     1 day ago
                   </Text>
                 </View>
+              </View>
+            </View> */}
+            <View className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <View className="flex items-center justify-center py-8">
+                <View className="bg-gray-100 dark:bg-gray-700 p-4 rounded-full mb-4">
+                  <MaterialCommunityIcons
+                    name="bell-outline"
+                    size={24}
+                    color={colorScheme === "dark" ? "#9CA3AF" : "#6B7280"}
+                  />
+                </View>
+                <Text className="font-medium text-gray-900 dark:text-white text-center mb-1">
+                  No notifications yet
+                </Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                  When you get notifications, they'll appear here
+                </Text>
               </View>
             </View>
           </View>
