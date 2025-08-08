@@ -378,7 +378,7 @@ export default function HomeScreen() {
               Recent Projects
             </Text>
             <TouchableOpacity
-              onPress={() => router.push("/features/Home/ProjectList")}
+              // onPress={() => router.push("/features/Home/ProjectList")}
             >
               <Text className="text-blue-600 dark:text-blue-400">View All</Text>
             </TouchableOpacity>
