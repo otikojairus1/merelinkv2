@@ -464,7 +464,7 @@ export default function HomeScreen() {
                   No Submissions Yet
                 </Text>
                 <Text className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
-                  When students submit their work, it will appear here
+                  When team leader submit their work, it will appear here
                 </Text>
               </View>
             )}

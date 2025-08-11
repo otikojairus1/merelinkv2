@@ -129,36 +129,7 @@ export default function ProjectDistribution() {
         throw new Error("No access token found");
       }
 
-      // Prepare volunteers array
-      const volunteersArray = volunteers
-        .split(",")
-        .map((v) => v.trim())
-        .filter((v) => v);
-
-      // Prepare budget breakdown
-      const budgetBreakdown = budgetItems
-        .filter((item) => item.item && item.amount)
-        .map((item) => ({
-          item: item.item,
-          amount: parseFloat(item.amount),
-        }));
-
-      // Prepare hourly updates
-      const hourlyUpdatesArray = hourlyUpdates
-        .filter((update) => update.hour && update.update)
-        .map((update) => ({
-          hour: update.hour,
-          update: update.update,
-        }));
-
-      // Prepare beneficiaries array
-      const beneficiariesArray = beneficiaries
-        .filter((ben) => ben.name && ben.bio)
-        .map((ben) => ({
-          name: ben.name,
-          bio: ben.bio,
-        }));
-
+      // Prepare the payload according to the API structure
       const payload = {
         project_id: projectId.toString(),
         distribution_center: distributionCenter,
@@ -172,14 +143,32 @@ export default function ProjectDistribution() {
         activity,
         report_link: reportLink,
         media_link: mediaLink,
-        volunteers: volunteersArray,
-        budget_breakdown: budgetBreakdown,
+        volunteers: volunteers
+          .split(",")
+          .map((v) => v.trim())
+          .filter((v) => v),
+        budget_breakdown: budgetItems
+          .filter((item) => item.item && item.amount)
+          .map((item) => ({
+            item: item.item,
+            amount: parseFloat(item.amount),
+          })),
         community_engagement: communityEngagement,
         challenges,
         crisis_background: crisisBackground,
         impact_story: impactStory,
-        hourly_updates: hourlyUpdatesArray,
-        beneficiaries: beneficiariesArray,
+        hourly_updates: hourlyUpdates
+          .filter((update) => update.hour && update.update)
+          .map((update) => ({
+            hour: update.hour,
+            update: update.update,
+          })),
+        beneficiaries: beneficiaries
+          .filter((ben) => ben.name && ben.bio)
+          .map((ben) => ({
+            name: ben.name,
+            bio: ben.bio,
+          })),
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
       };
@@ -202,7 +191,7 @@ export default function ProjectDistribution() {
         throw new Error("Failed to create distribution");
       }
     } catch (error: any) {
-      console.error("Error creating distribution:", error);
+      console.error("Error creating distribution:", error.response?.data);
       Alert.alert(
         "Error",
         error.response?.data?.message || "Failed to create distribution"
@@ -212,6 +201,7 @@ export default function ProjectDistribution() {
     }
   };
 
+  // Helper functions for dynamic fields
   const addBudgetItem = () => {
     setBudgetItems([...budgetItems, { item: "", amount: "" }]);
   };

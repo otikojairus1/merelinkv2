@@ -127,8 +127,8 @@ export default function AddProjectScreen() {
         `${BASE_URI}/api/projects`,
         {
           name: projectName,
-          organization_id: organizationId,
           description,
+          organization_id: organizationId,
           address,
           contact_person: contactPerson,
           contact_email: contactEmail,
